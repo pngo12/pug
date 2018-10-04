@@ -1,7 +1,7 @@
 // import { Text, View, Image } from 'react-native'
 
 import React from "react";
-import { GiftedChat } from "react-native-gifted-chat";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import Chatkit from "@pusher/chatkit";
 import {
   CHATKIT_TOKEN_PROVIDER_ENDPOINT,
@@ -10,6 +10,7 @@ import {
   CHATKIT_USER_NAME
 } from '../../config/info';
 
+import { View, Text } from 'react-native';
 
 export default class GameScreen extends React.Component {
   state = {
@@ -74,6 +75,23 @@ export default class GameScreen extends React.Component {
     }));
   }
 
+  renderBubble = (props) => {
+    if (props.isSameUser(props.currentMessage, props.previousMessage) && props.isSameDay(props.currentMessage, props.previousMessage)) {
+      return (
+        <Bubble
+          {...props}
+        />
+      );
+    }
+    return (
+      <View>
+        <Text style={{ fontSize: 10 }}>{props.currentMessage.user.name}</Text>
+        <Bubble
+          {...props}
+        />
+      </View>
+    );
+  }
 
   render() {
     return (
@@ -83,6 +101,7 @@ export default class GameScreen extends React.Component {
         user={{
           _id: CHATKIT_USER_NAME
         }}
+        renderBubble={this.renderBubble}
       />
     )
   }
