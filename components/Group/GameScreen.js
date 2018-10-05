@@ -12,6 +12,23 @@ import {
 
 import { View, Text } from 'react-native';
 
+
+const extractData = (data) => {
+  const { id, senderId, text, createdAt } = data;
+  const incomingMessage = {
+    _id: id,
+    text: text,
+    createdAt: new Date(createdAt),
+    user: {
+      _id: senderId,
+      name: senderId,
+      avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmXGGuS_PrRhQt73sGzdZvnkQrPXvtA-9cjcPxJLhLo8rW-sVA"
+    }
+  };
+  return incomingMessage;
+}
+
+
 export default class GameScreen extends React.Component {
   state = {
     messages: []
@@ -24,7 +41,7 @@ export default class GameScreen extends React.Component {
   };
 
 
-  componentDidMount() {
+  async componentDidMount() {
     // This will create a `tokenProvider` object. This object will be later used to make a Chatkit Manager instance.
     const tokenProvider = new Chatkit.TokenProvider({
       url: CHATKIT_TOKEN_PROVIDER_ENDPOINT
@@ -39,15 +56,35 @@ export default class GameScreen extends React.Component {
     });
 
     // In order to subscribe to the messages this user is receiving in this room, we need to `connect()` the `chatManager` and have a hook on `onNewMessage`. There are several other hooks that you can use for various scenarios. A comprehensive list can be found [here](https://docs.pusher.com/chatkit/reference/javascript#connection-hooks).
-    chatManager.connect().then(currentUser => {
-      this.currentUser = currentUser;
+    let currentUser = await chatManager.connect()
+    this.currentUser = currentUser;
+
+    // Fill the Messages
+    let messages = await this.currentUser.fetchMessages({
+      roomId: CHATKIT_ROOM_ID,
+      direction: 'older',
+      limit: 100,
+    })
+
+    console.log("MESSAGES:", messages);
+
+    messages = messages.map(extractData);
+    
+    this.setState({ messages }, () => {
       this.currentUser.subscribeToRoom({
         roomId: CHATKIT_ROOM_ID,
         hooks: {
           onNewMessage: this.onReceive
-        }
+        },
+        messageLimit: 0
       });
-    });
+    })
+  }
+
+  count = () => {
+    this.setState(prevState => ({
+      timer: prevState.timer + 1
+    }))
   }
 
   onSend([message]) {
@@ -58,17 +95,7 @@ export default class GameScreen extends React.Component {
   }
 
   onReceive = (data) => {
-    const { id, senderId, text, createdAt } = data;
-    const incomingMessage = {
-      _id: id,
-      text: text,
-      createdAt: new Date(createdAt),
-      user: {
-        _id: senderId,
-        name: senderId,
-        avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmXGGuS_PrRhQt73sGzdZvnkQrPXvtA-9cjcPxJLhLo8rW-sVA"
-      }
-    };
+    let incomingMessage = extractData(data)
 
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, incomingMessage)
@@ -94,6 +121,8 @@ export default class GameScreen extends React.Component {
   }
 
   render() {
+
+  
     return (
       <GiftedChat
         messages={this.state.messages}
