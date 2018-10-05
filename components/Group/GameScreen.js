@@ -12,8 +12,13 @@ import {
 
 import { View, Text } from 'react-native';
 
-
-const extractData = (data) => {
+/**
+ * Helper function to create messages to render from server response
+ * 
+ * Things to do:
+ * -> dynamically apply avatar based on a user's profile
+ */
+const extractMsgDetails = (data) => {
   const { id, senderId, text, createdAt } = data;
   const incomingMessage = {
     _id: id,
@@ -40,7 +45,6 @@ export default class GameScreen extends React.Component {
     };
   };
 
-
   async componentDidMount() {
     // This will create a `tokenProvider` object. This object will be later used to make a Chatkit Manager instance.
     const tokenProvider = new Chatkit.TokenProvider({
@@ -52,12 +56,11 @@ export default class GameScreen extends React.Component {
     const chatManager = new Chatkit.ChatManager({
       instanceLocator: CHATKIT_INSTANCE_LOCATOR,
       userId: CHATKIT_USER_NAME,
-      tokenProvider: tokenProvider
+      tokenProvider
     });
 
     // In order to subscribe to the messages this user is receiving in this room, we need to `connect()` the `chatManager` and have a hook on `onNewMessage`. There are several other hooks that you can use for various scenarios. A comprehensive list can be found [here](https://docs.pusher.com/chatkit/reference/javascript#connection-hooks).
-    let currentUser = await chatManager.connect()
-    this.currentUser = currentUser;
+    this.currentUser = await chatManager.connect();
 
     // Fill the Messages
     let messages = await this.currentUser.fetchMessages({
@@ -66,10 +69,8 @@ export default class GameScreen extends React.Component {
       limit: 100,
     })
 
-    console.log("MESSAGES:", messages);
+    messages = messages.map(extractMsgDetails).reverse();
 
-    messages = messages.map(extractData);
-    
     this.setState({ messages }, () => {
       this.currentUser.subscribeToRoom({
         roomId: CHATKIT_ROOM_ID,
@@ -81,13 +82,8 @@ export default class GameScreen extends React.Component {
     })
   }
 
-  count = () => {
-    this.setState(prevState => ({
-      timer: prevState.timer + 1
-    }))
-  }
-
-  onSend([message]) {
+  // brackets in parameter mean take the first item of an array and assign it to variable message
+  onSend = ([message]) => {
     this.currentUser.sendMessage({
       text: message.text,
       roomId: CHATKIT_ROOM_ID
@@ -95,7 +91,7 @@ export default class GameScreen extends React.Component {
   }
 
   onReceive = (data) => {
-    let incomingMessage = extractData(data)
+    let incomingMessage = extractMsgDetails(data);
 
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, incomingMessage)
@@ -121,8 +117,6 @@ export default class GameScreen extends React.Component {
   }
 
   render() {
-
-  
     return (
       <GiftedChat
         messages={this.state.messages}

@@ -13,7 +13,6 @@ const TabNavigator = createBottomTabNavigator(
       Home: GroupStack,
       Profile: ProfileStack,
       Settings: SettingsStack
-    
   },
   {
     navigationOptions: ({ navigation }) => ({
@@ -39,12 +38,3 @@ const TabNavigator = createBottomTabNavigator(
 );
 
 export default App = () => <TabNavigator />
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
