@@ -1,8 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from 'react-navigation';
+
+// Imports to setup Redux
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import rootReducer from './components/Redux/Reducers';
 
 import GroupStack from './components/Group/GroupStack'
 import ProfileStack from './components/Profile/ProfileStack'
@@ -10,9 +15,9 @@ import SettingsStack from './components/Settings/SettingsStack'
 
 const TabNavigator = createBottomTabNavigator(
   {
-      Home: GroupStack,
-      Profile: ProfileStack,
-      Settings: SettingsStack
+    Home: GroupStack,
+    Profile: ProfileStack,
+    Settings: SettingsStack
   },
   {
     navigationOptions: ({ navigation }) => ({
@@ -37,4 +42,14 @@ const TabNavigator = createBottomTabNavigator(
   }
 );
 
-export default App = () => <TabNavigator />
+const store = createStore(
+  rootReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+  applyMiddleware(thunk)
+);
+
+export default App = () => (
+  <Provider store={store}>
+    <TabNavigator />
+  </Provider>
+);
