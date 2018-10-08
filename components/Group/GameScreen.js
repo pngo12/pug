@@ -1,5 +1,3 @@
-// import { Text, View, Image } from 'react-native'
-
 import React from "react";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import Chatkit from "@pusher/chatkit";
@@ -102,7 +100,8 @@ export default class GameScreen extends React.Component {
 
   renderBubble = (props) => {
     let username = props.currentMessage.user.name
-    let color = this.getColor(username)
+    let color = this.getBubbleBackgroundColor(username)
+
     if (props.isSameUser(props.currentMessage, props.previousMessage) && props.isSameDay(props.currentMessage, props.previousMessage)) {
       return (
         <Bubble
@@ -123,6 +122,7 @@ export default class GameScreen extends React.Component {
         />
       );
     }
+
     return ( 
       <View>
         <Text style={{ fontSize: 10 }}>{props.currentMessage.user.name}</Text>
@@ -146,7 +146,7 @@ export default class GameScreen extends React.Component {
     );
   }
 
-  getColor(username){
+  getBubbleBackgroundColor = (username) => {
     let currentUsersInRoom = this.currentUser.users.map(user => user.id)
     let usernameIndex = currentUsersInRoom.findIndex(user => user === username)
     return bubbleBackgroundColors[usernameIndex];
