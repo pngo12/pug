@@ -1,5 +1,3 @@
-// import { Text, View, Image } from 'react-native'
-
 import React from "react";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import Chatkit from "@pusher/chatkit";
@@ -11,6 +9,8 @@ import {
 } from '../../config/info';
 
 import { View, Text } from 'react-native';
+
+import { bubbleBackgroundColors } from '../../constants';
 
 /**
  * Helper function to create messages to render from server response
@@ -69,6 +69,7 @@ export default class GameScreen extends React.Component {
       limit: 100,
     })
 
+
     messages = messages.map(extractMsgDetails).reverse();
 
     this.setState({ messages }, () => {
@@ -99,33 +100,72 @@ export default class GameScreen extends React.Component {
   }
 
   renderBubble = (props) => {
+    let username = props.currentMessage.user.name
+    let color = this.getBubbleBackgroundColor(username)
+
     if (props.isSameUser(props.currentMessage, props.previousMessage) && props.isSameDay(props.currentMessage, props.previousMessage)) {
       return (
         <Bubble
           {...props}
+          textStyle={{
+          right: {
+            color: 'white'
+          },
+          left: {
+            color: 'white'
+          }
+        }}
+        wrapperStyle={{
+          left: {
+            backgroundColor: color
+          }
+        }}
         />
       );
     }
-    return (
+
+    return ( 
       <View>
         <Text style={{ fontSize: 10 }}>{props.currentMessage.user.name}</Text>
         <Bubble
           {...props}
+          textStyle={{
+          right: {
+            color: 'white'
+          },
+          left: {
+            color: 'white'
+          }
+        }}
+        wrapperStyle={{
+          left: {
+            backgroundColor: color
+          }
+        }}
         />
       </View>
     );
   }
 
+
+  getBubbleBackgroundColor = (username) => {
+    let currentUsersInRoom = this.currentUser.users.map(user => user.id)
+    let usernameIndex = currentUsersInRoom.findIndex(user => user === username)
+    return bubbleBackgroundColors[usernameIndex];
+  }
+
   render() {
     return (
-      <GiftedChat
-        messages={this.state.messages}
-        onSend={messages => this.onSend(messages)}
-        user={{
-          _id: CHATKIT_USER_NAME
-        }}
-        renderBubble={this.renderBubble}
-      />
+      <View style={{ backgroundColor: "#F0F8FF", flex:1 }}>
+        <GiftedChat
+          messages={this.state.messages}
+          onSend={messages => this.onSend(messages)}
+          user={{
+            _id: CHATKIT_USER_NAME
+          }}
+          renderBubble={this.renderBubble}
+        />
+      </View>
     )
   }
 }
