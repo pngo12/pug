@@ -7,9 +7,9 @@ export const bubbleBackgroundColors = [
   '#ff7f50', //orange
 
  //** Some extra lighter colors if we need them **/
- // '#ffb6c1', //pink
- // '#f08080', //light salmon
- // '#66cccc', //cyan
- // '#b4eeb4', //light green
- // '#cbbeb5'  //sand
+ '#ffb6c1', //pink
+ '#f08080', //light salmon
+ '#66cccc', //cyan
+ '#b4eeb4', //light green
+ '#cbbeb5'  //sand
   ];
