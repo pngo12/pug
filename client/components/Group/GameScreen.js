@@ -69,7 +69,6 @@ export default class GameScreen extends React.Component {
       limit: 100,
     })
 
-
     messages = messages.map(extractMsgDetails).reverse();
 
     this.setState({ messages }, () => {

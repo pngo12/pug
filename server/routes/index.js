@@ -29,6 +29,11 @@ const filterRooms = game => ({ name }) => {
   return validGames[gameName] !== undefined && gameName === game;
 }
 
+/**
+ * Returns a dict of valid games 
+ * -> Keys are need to send back for filter
+ * -> values are display names
+ */
 router.get('/gamelist', (req, res) => {
   res.json(validGames);
 })
@@ -55,8 +60,10 @@ router.get('/gamerooms', async (req, res) => {
   }
 })
 
-
-router.get('/all', async (req, res) => {
+/**
+ * Grabs all users in server
+ */
+router.get('/allusers', async (req, res) => {
   try {
     res.send(await chatkit.getUsers());
   } catch ({ status, headers, ...err_messages }) {
@@ -64,8 +71,19 @@ router.get('/all', async (req, res) => {
   }
 })
 
-/* GET home page. */
-router.post('/', async (req, res) => {
+/**
+ * Create a new user
+ * 
+ * Requirement:
+ * > id
+ * > name
+ * 
+ * Future: 
+ * > Avatar 
+ * > Profile info
+ * > Game info (usernames & discord connection)
+ */
+router.post('/createuser', async (req, res) => {
   try {
     let { id, name } = req.body;
     let user = await chatkit.createUser({ id, name });
