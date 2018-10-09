@@ -36,7 +36,8 @@ const extractMsgDetails = (data) => {
 
 export default class GameScreen extends React.Component {
   state = {
-    messages: []
+    messages: [],
+    roomId: ""
   };
 
   static navigationOptions = ({ navigation }) => {
@@ -46,6 +47,9 @@ export default class GameScreen extends React.Component {
   };
 
   async componentDidMount() {
+    let details = this.props.navigation.getParam('details', {});
+    let roomId = details.id;
+
     // This will create a `tokenProvider` object. This object will be later used to make a Chatkit Manager instance.
     const tokenProvider = new Chatkit.TokenProvider({
       url: CHATKIT_TOKEN_PROVIDER_ENDPOINT
@@ -64,29 +68,34 @@ export default class GameScreen extends React.Component {
 
     // Fill the Messages
     let messages = await this.currentUser.fetchMessages({
-      roomId: CHATKIT_ROOM_ID,
+      roomId,
       direction: 'older',
       limit: 100,
     })
 
     messages = messages.map(extractMsgDetails).reverse();
 
-    this.setState({ messages }, () => {
+    this.setState({
+      messages,
+      roomId
+    }, () => {
       this.currentUser.subscribeToRoom({
-        roomId: CHATKIT_ROOM_ID,
+        roomId,
         hooks: {
           onNewMessage: this.onReceive
         },
         messageLimit: 0
       });
     })
+
+
   }
 
   // brackets in parameter mean take the first item of an array and assign it to variable message
   onSend = ([message]) => {
     this.currentUser.sendMessage({
       text: message.text,
-      roomId: CHATKIT_ROOM_ID
+      roomId: this.state.roomId
     });
   }
 
@@ -107,40 +116,40 @@ export default class GameScreen extends React.Component {
         <Bubble
           {...props}
           textStyle={{
-          right: {
-            color: 'white'
-          },
-          left: {
-            color: 'white'
-          }
-        }}
-        wrapperStyle={{
-          left: {
-            backgroundColor: color
-          }
-        }}
+            right: {
+              color: 'white'
+            },
+            left: {
+              color: 'white'
+            }
+          }}
+          wrapperStyle={{
+            left: {
+              backgroundColor: color
+            }
+          }}
         />
       );
     }
 
-    return ( 
+    return (
       <View>
         <Text style={{ fontSize: 10 }}>{props.currentMessage.user.name}</Text>
         <Bubble
           {...props}
           textStyle={{
-          right: {
-            color: 'white'
-          },
-          left: {
-            color: 'white'
-          }
-        }}
-        wrapperStyle={{
-          left: {
-            backgroundColor: color
-          }
-        }}
+            right: {
+              color: 'white'
+            },
+            left: {
+              color: 'white'
+            }
+          }}
+          wrapperStyle={{
+            left: {
+              backgroundColor: color
+            }
+          }}
         />
       </View>
     );
@@ -155,7 +164,7 @@ export default class GameScreen extends React.Component {
 
   render() {
     return (
-      <View style={{ backgroundColor: "#F0F8FF", flex:1 }}>
+      <View style={{ backgroundColor: "#F0F8FF", flex: 1 }}>
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}

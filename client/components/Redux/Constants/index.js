@@ -1,1 +1,3 @@
-export const 
+export const FETCH_VALID_GAMES = 'FETCH_VALID_GAMES';
+export const FETCH_JOINABLE = 'FETCH_JOINABLE';
+export const FETCH_JOINED_ROOMS = 'FETCH_JOINED_ROOMS';
