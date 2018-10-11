@@ -6,7 +6,7 @@ const initialState = {
   joinedRooms: []
 };
 
-const gameReducer = (state = initialState, action) => {
+const roomReducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_VALID_GAMES:
       return {
@@ -28,4 +28,4 @@ const gameReducer = (state = initialState, action) => {
   }
 }
 
-export default gameReducer;
+export default roomReducer;

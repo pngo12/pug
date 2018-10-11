@@ -1,20 +1,75 @@
 import axios from 'axios';
-import { FETCH_VALID_GAMES, FETCH_JOINABLE, FETCH_JOINED_ROOMS } from '../Constants'
+import Chatkit from "@pusher/chatkit";
 
-// Template Thunk
-// --------------
-// export const sampleThunk = () => dispatch => {
-//   // this sends an action that can be used to start a loading GIF
-//   dispatch({ type: REQUESTED_DATA });
+import {
+  FETCH_VALID_GAMES,
+  FETCH_JOINABLE,
+  FETCH_JOINED_ROOMS,
+  CONNECTION_REQUEST,
+  CONNECTED,
+  DISCONNECTED,
+  SUBSCRIBE,
+  CHANGE_CHATROOM,
+  SEND_MESSAGE
+} from '../Constants'
 
-//   axios.get('')
-//     .then(res => {
+import {
+  CHATKIT_TOKEN_PROVIDER_ENDPOINT,
+  CHATKIT_INSTANCE_LOCATOR
+} from '../../../config/info';
 
-//       // this sends an action to send HTTP response data to Redux store
-//       dispatch({ type: RECEIVED_DATA, data: res.data.message })
-//     });
-// }
 
+// This will instantiate a `chatManager` object. This object can be used to subscribe to any number of rooms and users and corresponding messages.
+// For the purpose of this example we will use single room-user pair.
+const _createChatManager = (userId, url, instanceLocator) => {
+  const tokenProvider = new Chatkit.TokenProvider({ url });
+
+  return new Chatkit.ChatManager({
+    instanceLocator,
+    userId,
+    tokenProvider,
+    connectionTimeout: 20000
+  });
+}
+
+// Our initial connection action
+export const connectChatKit = userId => async dispatch => {
+  dispatch({ type: CONNECTION_REQUEST });
+
+  try {
+    let chatManager = _createChatManager(userId, CHATKIT_TOKEN_PROVIDER_ENDPOINT, CHATKIT_INSTANCE_LOCATOR);
+    let currentUser = await chatManager.connect();
+    console.log(`Successful connection ${currentUser}`);
+    dispatch({ type: CONNECTED, currentUser });
+    dispatch(subscribeToAllJoined(userId));
+
+  } catch (err) {
+
+    console.error(`Error on connection ${err}`);
+    dispatch({ type: DISCONNECTED });
+
+  }
+}
+
+
+// interacts with currentUser (ChatKit)
+export const sendMessage = text => ({ type: SEND_MESSAGE, text })
+
+export const changeChatRoom = roomId => ({ type: CHANGE_CHATROOM, roomId })
+
+export const subscribeToRoom = (roomId, length) => ({ type: SUBSCRIBE, roomId, length })
+
+export const subscribeToAllJoined = userId => async dispatch => {
+  let { data: rooms } = await axios.get(`http://localhost:5000/alljoinedrooms?userId=${userId}`);
+  rooms.forEach(({ id }) => {
+    dispatch(subscribeToRoom(id, rooms.length))
+  })
+}
+
+
+/**
+ * Interacts with our /server
+ */
 export const fetchValidGames = () => async dispatch => {
   let { data } = await axios.get('http://localhost:5000/gamelist');
   dispatch({ type: FETCH_VALID_GAMES, validGames: data });

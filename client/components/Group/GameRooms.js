@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { fetchJoinableRooms, fetchJoinedRooms } from '../Redux/Actions';
+import {
+  fetchJoinableRooms,
+  fetchJoinedRooms,
+  changeChatRoom
+} from '../Redux/Actions';
 
 import { Text, View } from 'react-native'
 import { List, ListItem } from 'react-native-elements'
@@ -19,8 +23,10 @@ class GameRooms extends Component {
     fetchJoinedRooms(game, CHATKIT_USER_NAME);
   }
 
-  selectGroup = ({ name, ...details }) => () => {
-    this.props.navigation.navigate('Game', { title: name, details });
+  selectRoom = room => () => {
+    const { navigation, changeChatRoom } = this.props;
+    changeChatRoom(room.id);
+    navigation.navigate('Chatroom', { title: room.name });
   }
 
   render() {
@@ -31,7 +37,7 @@ class GameRooms extends Component {
           {
             joinedRooms.map((room) => (
               <ListItem
-                onPress={this.selectGroup(room)}
+                onPress={this.selectRoom(room)}
                 key={room.id}
                 title={room.name}
               />
@@ -48,7 +54,7 @@ class GameRooms extends Component {
           {
             joinableRooms.map((room) => (
               <ListItem
-                onPress={this.selectGroup(room)}
+                onPress={this.selectRoom(room)}
                 key={room.id}
                 title={room.name}
               />
@@ -60,12 +66,13 @@ class GameRooms extends Component {
   }
 }
 
-const mapStateToProps = ({ gameReducer }) => ({
-  joinableRooms: gameReducer.joinableRooms,
-  joinedRooms: gameReducer.joinedRooms
+const mapStateToProps = ({ roomReducer }) => ({
+  joinableRooms: roomReducer.joinableRooms,
+  joinedRooms: roomReducer.joinedRooms
 })
 
 const mapDispatchToProps = dispatch => ({
+  changeChatRoom: roomId => dispatch(changeChatRoom(roomId)),
   fetchJoinableRooms: (game, userId) => dispatch(fetchJoinableRooms(game, userId)),
   fetchJoinedRooms: (game, userId) => dispatch(fetchJoinedRooms(game, userId))
 })

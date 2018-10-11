@@ -42,13 +42,16 @@ const validGames = [
 
 // --- helper functions ---
 
-// extracts the room name from a room created
+// extracts the Game name from a room created
 const extractGameName = fullName => fullName.split('-')[0];
 
-const filterRooms = game => ({ name }) => {
+// get only games with the appropriate prefix
+const _filterRooms = game => ({ name }) => {
   let gameName = extractGameName(name);
   return validGames.find(g => g.server === gameName) !== undefined && gameName === game;
 }
+
+const _validGames = ({ name }) => validGames.find(g => g.server === extractGameName(name)) !== undefined;
 
 /**
  * Returns a dict of valid games 
@@ -73,8 +76,12 @@ router.get('/gamerooms', async (req, res) => {
     let { game, userId } = req.query;
     let joinableRooms = await chatkit.getUserJoinableRooms({ userId })
 
-    joinableRooms = joinableRooms.filter(filterRooms(game));
-    joinableRooms = joinableRooms.map(room => ({ ...room, name: room.name.split('-')[1] }))
+    joinableRooms = joinableRooms.filter(_filterRooms(game));
+    joinableRooms = joinableRooms.map(room => ({
+      ...room,
+      name: room.name.split('-')[1],
+      game: extractGameName(room.name)
+    }))
 
     res.send(joinableRooms);
   } catch (err) {
@@ -82,14 +89,49 @@ router.get('/gamerooms', async (req, res) => {
   }
 })
 
+/**
+ * all rooms a user is a part of; filtered for valid games
+ */
+router.get('/alljoinedrooms', async (req, res) => {
+  try {
+
+    let { userId } = req.query;
+    let joinableRooms = await chatkit.getUserRooms({ userId })
+
+    joinableRooms = joinableRooms.filter(_validGames);
+    joinableRooms = joinableRooms.map(room => ({
+      ...room,
+      name: room.name.split('-')[1],
+      game: extractGameName(room.name)
+    }))
+
+    res.send(joinableRooms);
+
+  } catch (err) {
+    res.status(err.status).send(err);
+  }
+})
+
+/**
+ * All rooms that the user is a part of based on game
+ */
 router.get('/userrooms', async (req, res) => {
-  let { game, userId } = req.query
-  let rooms = await chatkit.getUserRooms({ userId });
-
-  rooms = rooms.filter(filterRooms(game));
-  rooms = rooms.map(room => ({ ...room, name: room.name.split('-')[1] }));
-
-  res.send(rooms);
+  try {
+    let { game, userId } = req.query
+    let rooms = await chatkit.getUserRooms({ userId });
+  
+    rooms = rooms.filter(_filterRooms(game));
+    rooms = rooms.map(room => ({
+      ...room,
+      name: room.name.split('-')[1],
+      game: extractGameName(room.name)
+    }));
+  
+    res.send(rooms);
+    
+  } catch (err) {
+    res.status(err.status).send(err);
+  }
 })
 
 

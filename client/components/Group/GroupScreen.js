@@ -40,8 +40,8 @@ class GroupScreen extends Component {
   }
 }
 
-const mapStateToProps = ({ gameReducer }) => ({
-  games: gameReducer.validGames
+const mapStateToProps = ({ roomReducer }) => ({
+  games: roomReducer.validGames
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -1,11 +1,11 @@
 import { createStackNavigator } from 'react-navigation'
 import GroupScreen from './GroupScreen'
-import GameScreen from './GameScreen'
+import ChatScreen from './ChatScreen'
 import GameRooms from './GameRooms'
 
 const GroupStack = createStackNavigator({
   GroupHome: GroupScreen,
-  Game: GameScreen,
+  Chatroom: ChatScreen,
   Rooms: GameRooms
 },
 {
