@@ -64,6 +64,44 @@ router.get('/gamelist', (req, res) => {
 
 
 /**
+ * Check if I can join a room
+ * 
+ */
+router.get('/checkroom/:userId/:roomId', async (req, res) => {
+  console.log(req.params);
+  try {
+    let { userId, roomId } = req.params;
+    // get joinable rooms and then find it
+
+    let joinableRooms = await chatkit.getUserJoinableRooms({ userId })
+
+    joinableRooms = joinableRooms.filter(_validGames);
+    joinableRooms = joinableRooms.map(room => {
+      let maxOccupancy = parseInt(room.name.split('-')[2]);
+      let amtUsers = room.member_user_ids.length;
+      return {
+        ...room,
+        name: room.name.split('-')[1],
+        game: extractGameName(room.name),
+        maxOccupancy,
+        amtUsers,
+        full: amtUsers >= maxOccupancy
+      }
+    })
+
+    let { full } = joinableRooms.find(room => room.id === parseInt(roomId))
+
+    res.send({ allowed: !full })
+
+  } catch (err) {
+    res.status(404).send(err);
+  }
+})
+
+
+
+
+/**
  * On Creating Game Rooms:
  * 
  * They must have a valid game prefix based on the 'validGames' variable above:
@@ -77,11 +115,18 @@ router.get('/gamerooms', async (req, res) => {
     let joinableRooms = await chatkit.getUserJoinableRooms({ userId })
 
     joinableRooms = joinableRooms.filter(_filterRooms(game));
-    joinableRooms = joinableRooms.map(room => ({
-      ...room,
-      name: room.name.split('-')[1],
-      game: extractGameName(room.name)
-    }))
+    joinableRooms = joinableRooms.map(room => {
+      let maxOccupancy = parseInt(room.name.split('-')[2]);
+      let amtUsers = room.member_user_ids.length;
+      return {
+        ...room,
+        name: room.name.split('-')[1],
+        game: extractGameName(room.name),
+        maxOccupancy,
+        amtUsers,
+        full: amtUsers >= maxOccupancy
+      }
+    })
 
     res.send(joinableRooms);
   } catch (err) {
@@ -90,7 +135,7 @@ router.get('/gamerooms', async (req, res) => {
 })
 
 /**
- * all rooms a user is a part of; filtered for valid games
+ * all rooms a user is a part of; filtered for valid games but not specific games (LOL PUBG etc shown)
  */
 router.get('/alljoinedrooms', async (req, res) => {
   try {
@@ -99,16 +144,23 @@ router.get('/alljoinedrooms', async (req, res) => {
     let joinableRooms = await chatkit.getUserRooms({ userId })
 
     joinableRooms = joinableRooms.filter(_validGames);
-    joinableRooms = joinableRooms.map(room => ({
-      ...room,
-      name: room.name.split('-')[1],
-      game: extractGameName(room.name)
-    }))
+    joinableRooms = joinableRooms.map(room => {
+      let maxOccupancy = parseInt(room.name.split('-')[2]);
+      let amtUsers = room.member_user_ids.length;
+      return {
+        ...room,
+        name: room.name.split('-')[1],
+        game: extractGameName(room.name),
+        maxOccupancy,
+        amtUsers,
+        full: amtUsers >= maxOccupancy
+      }
+    })
 
     res.send(joinableRooms);
 
   } catch (err) {
-    res.status(err.status).send(err);
+    res.status(404).send(err);
   }
 })
 
@@ -119,18 +171,26 @@ router.get('/userrooms', async (req, res) => {
   try {
     let { game, userId } = req.query
     let rooms = await chatkit.getUserRooms({ userId });
-  
+
     rooms = rooms.filter(_filterRooms(game));
-    rooms = rooms.map(room => ({
-      ...room,
-      name: room.name.split('-')[1],
-      game: extractGameName(room.name)
-    }));
-  
+    rooms = rooms.map(room => {
+      let maxOccupancy = parseInt(room.name.split('-')[2]);
+      let amtUsers = room.member_user_ids.length;
+      return {
+        ...room,
+        name: room.name.split('-')[1],
+        game: extractGameName(room.name),
+        maxOccupancy,
+        amtUsers,
+        full: amtUsers >= maxOccupancy
+      }
+    }
+    );
+
     res.send(rooms);
-    
+
   } catch (err) {
-    res.status(err.status).send(err);
+    res.status(404).send(err);
   }
 })
 
