@@ -67,10 +67,10 @@ router.get('/gamelist', (req, res) => {
  * Check if I can join a room
  * 
  */
-router.get('/checkroom/:userId/:roomId', async (req, res) => {
-  console.log(req.params);
+router.get('/checkroom', async (req, res) => {
+  
   try {
-    let { userId, roomId } = req.params;
+    let { userId, roomId } = req.query;
     // get joinable rooms and then find it
 
     let joinableRooms = await chatkit.getUserJoinableRooms({ userId })
@@ -184,8 +184,7 @@ router.get('/userrooms', async (req, res) => {
         amtUsers,
         full: amtUsers >= maxOccupancy
       }
-    }
-    );
+    });
 
     res.send(rooms);
 
