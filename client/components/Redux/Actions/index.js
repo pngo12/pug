@@ -10,7 +10,8 @@ import {
   DISCONNECTED,
   SUBSCRIBE,
   CHANGE_CHATROOM,
-  SEND_MESSAGE
+  SEND_MESSAGE,
+  NO_JOINED_ROOMS
 } from '../Constants'
 
 import {
@@ -61,9 +62,14 @@ export const subscribeToRoom = (roomId, length) => ({ type: SUBSCRIBE, roomId, l
 
 export const subscribeToAllJoined = userId => async dispatch => {
   let { data: rooms } = await axios.get(`http://localhost:5000/alljoinedrooms?userId=${userId}`);
+
   rooms.forEach(({ id }) => {
     dispatch(subscribeToRoom(id, rooms.length))
   })
+
+  if (rooms.length === 0) {
+    dispatch({ type: NO_JOINED_ROOMS })
+  }
 }
 
 

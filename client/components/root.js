@@ -11,6 +11,7 @@ import SettingsStack from './Settings/SettingsStack'
 import { connectChatKit, subscribeToRoom } from './Redux/Actions'
 import { CHATKIT_USER_NAME } from '../config/info'
 
+import { SplashScreen } from 'expo';
 
 
 const TabNavigator = createBottomTabNavigator(
@@ -46,17 +47,27 @@ const TabNavigator = createBottomTabNavigator(
 class Root extends Component {
 
   componentDidMount() {
+    SplashScreen.preventAutoHide();
     this.props.connectChatKit(CHATKIT_USER_NAME)
   }
 
   render() {
-    return <TabNavigator />;
+    if (!this.props.doneInitialSubscriptions) {
+      return null;
+    } else {
+      SplashScreen.hide()
+      return <TabNavigator />;
+    }
   }
 }
+
+const mapStateToProps = ({ chatReducer }) => ({
+  doneInitialSubscriptions: chatReducer.doneInitialSubscriptions
+})
 
 const mapDispatchToProps = dispatch => ({
   connectChatKit: userId => dispatch(connectChatKit(userId)),
   subscribeToRoom: roomId => dispatch(subscribeToRoom(roomId))
 })
 
-export default connect(null, mapDispatchToProps)(Root);
+export default connect(mapStateToProps, mapDispatchToProps)(Root);

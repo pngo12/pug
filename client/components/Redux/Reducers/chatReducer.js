@@ -6,7 +6,8 @@ import {
   NEW_MESSAGE,
   SUBSCRIBE,
   CHANGE_CHATROOM,
-  SEND_MESSAGE
+  SEND_MESSAGE,
+  NO_JOINED_ROOMS
 } from '../Constants'
 
 const _createRoom = ({ roomId, messages }) => ({
@@ -38,11 +39,16 @@ const initialState = {
   rooms: [],
   connected: false,
   doneInitialSubscriptions: false,       // can be used to signal end of pre-loading; end of loading screen
-  currentRoomId: 18218531
+  currentRoomId: 0
 };
 
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
+    case NO_JOINED_ROOMS:     // case of a user that haven't joined a room
+      return {
+        ...state,
+        doneInitialSubscriptions: true
+      }
     case SUBSCRIBE:
       // turn on 'doneInitialSubscriptions' when last initial subscription comes in
       let { rooms, doneInitialSubscriptions } = state;
