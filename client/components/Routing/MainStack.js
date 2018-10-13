@@ -8,6 +8,7 @@ import ProfileStack from '../Profile/ProfileStack';
 import SettingsStack from '../Settings/SettingsStack';
 
 import LoginStack from '../Login/LoginStack';
+import AuthLoadingScreen from './AuthLoadingScreen';
 
 const AppNavigator = createBottomTabNavigator(
   {
@@ -41,8 +42,9 @@ const AppNavigator = createBottomTabNavigator(
 
 export default createSwitchNavigator(
   {
+    Auth: AuthLoadingScreen,
     App: AppNavigator,
-    LoginScreen: {
+    LoginStack: {
       screen: LoginStack,
       navigationOptions: {
         tabBarVisible: false
@@ -50,6 +52,6 @@ export default createSwitchNavigator(
     }
   },
   {
-    initialRouteName: "LoginScreen"
+    initialRouteName: "Auth"
   }
 );

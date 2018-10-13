@@ -1,20 +1,49 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+import { Text, View, ImageBackground, TextInput, TouchableHighlight, Image, AsyncStorage } from 'react-native';
 
-import { Text, View, ImageBackground, TextInput, TouchableHighlight, Image } from 'react-native';
+import { SERVER_URL } from '../../config/info';
+
 import Background from '../../assets/Background1.jpg';
 import Logo from '../../assets/puglogohead.png';
 import { Ionicons } from '@expo/vector-icons';
-
 import LoginStyle from '../Styles/Login';
 
-class Login extends Component {
+
+class LoginScreen extends Component {
   state = {
-    email: '',
-    password: ''
+    userId: '',
+    password: '',
+    invalid: false,
+    pending: false
   }
 
-  LoginCheck = () => {
-    this.props.navigation.navigate('Home')
+  _loginAsync = async () => {
+    const { userId, password } = this.state;
+
+    try {
+      let { data } = await axios.post(`${SERVER_URL}/login`, { userId, password });
+
+      console.log("HERE!");
+
+      if (data.valid) {
+        await AsyncStorage.multiSet(["userToken", "userId"], [data.token, userId]);
+        this.props.navigation.navigate('Home');
+      } else {
+        this.setState({
+          invalid: true,
+          pending: false
+        })
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  _sendLogin = () => {
+    this.setState({
+      pending: true
+    }, this._loginAsync)
   }
 
   render() {
@@ -34,16 +63,16 @@ class Login extends Component {
         <View style={container}>
           <Image source={Logo} style={{ flex: 0.45, marginBottom: 30 }} resizeMode="contain" />
           <View style={inputContainer}>
-            <Ionicons style={inputIcon} name="md-mail"></Ionicons>
+            <Ionicons style={inputIcon} name="ios-person" />
             <TextInput style={inputs}
-              placeholder="Email"
-              keyboardType="email-address"
+              placeholder="User ID"
+              keyboardType="default"
               underlineColorAndroid='transparent'
-              onChangeText={(email) => this.setState({ email })} />
+              onChangeText={(userId) => this.setState({ userId })} />
           </View>
 
           <View style={inputContainer}>
-            <Ionicons style={inputIcon} name="md-key"></Ionicons>
+            <Ionicons style={inputIcon} name="ios-key" />
             <TextInput style={inputs}
               placeholder="Password"
               secureTextEntry={true}
@@ -51,7 +80,7 @@ class Login extends Component {
               onChangeText={(password) => this.setState({ password })} />
           </View>
 
-          <TouchableHighlight style={[buttonContainer, loginButton]} onPress={this.LoginCheck}>
+          <TouchableHighlight style={[buttonContainer, loginButton]} onPress={this._sendLogin}>
             <Text style={loginText}>Login</Text>
           </TouchableHighlight>
 
@@ -69,4 +98,4 @@ class Login extends Component {
 }
 
 
-export default Login;
+export default LoginScreen;

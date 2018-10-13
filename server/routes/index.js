@@ -68,7 +68,7 @@ router.get('/gamelist', (req, res) => {
  * 
  */
 router.get('/checkroom', async (req, res) => {
-  
+
   try {
     let { userId, roomId } = req.query;
     // get joinable rooms and then find it
@@ -226,5 +226,17 @@ router.post('/createuser', async (req, res) => {
     res.status(status).send(err_messages);
   }
 });
+
+
+router.post('/login', async (req, res) => {
+
+  let { userId, password } = req.body;
+
+  // always allowed right now
+  res.send({
+    valid: true,
+    token: 'abc'
+  })
+})
 
 module.exports = router;
