@@ -44,12 +44,7 @@ export default createSwitchNavigator(
   {
     Auth: AuthLoadingScreen,
     App: AppNavigator,
-    LoginStack: {
-      screen: LoginStack,
-      navigationOptions: {
-        tabBarVisible: false
-      }
-    }
+    LoginStack
   },
   {
     initialRouteName: "Auth"

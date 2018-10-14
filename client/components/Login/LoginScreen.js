@@ -27,7 +27,10 @@ class LoginScreen extends Component {
       console.log("HERE!");
 
       if (data.valid) {
-        await AsyncStorage.multiSet(["userToken", "userId"], [data.token, userId]);
+        await AsyncStorage.multiSet([
+          ["userToken", data.token],
+          ["userId", userId]
+        ]);
         this.props.navigation.navigate('Home');
       } else {
         this.setState({

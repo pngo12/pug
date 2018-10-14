@@ -21,7 +21,7 @@ import { sendMessage } from '../Redux/Actions'
 class ChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('title', 'A Nested Details Screen'),
+      title: navigation.getParam('title', 'A Nested Details Screen')
     };
   };
 

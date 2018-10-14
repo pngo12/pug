@@ -9,8 +9,8 @@ import GameRooms from './GameRooms'
 const GroupStack = createStackNavigator(
   {
     GroupHome: GroupScreen,
-    Chatroom: ChatScreen,
-    Rooms: GameRooms
+    Rooms: GameRooms,
+    Chatroom: ChatScreen
   },
   {
     initialRouteName: 'GroupHome'
