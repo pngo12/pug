@@ -11,7 +11,8 @@ import {
   SUBSCRIBE,
   CHANGE_CHATROOM,
   SEND_MESSAGE,
-  NO_JOINED_ROOMS
+  NO_JOINED_ROOMS,
+  ERROR_SUBSCRIBING
 } from '../Constants'
 
 import {
@@ -78,7 +79,7 @@ export const subscribeToAllJoined = userId => async dispatch => {
   } catch (err) {
     console.log("USER ID: ", userId)
     console.error(err);
-    dispatch({ type: "ERROR SUBSCRIBING" })
+    dispatch({ type: ERROR_SUBSCRIBING })
   }
 }
 
