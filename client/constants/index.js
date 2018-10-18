@@ -13,3 +13,21 @@ export const bubbleBackgroundColors = [
  '#b4eeb4', //light green
  '#cbbeb5'  //sand
   ];
+
+  export const dropdownSelection = [
+    {
+    value: '2',
+    },
+    {
+    value: '3',
+    },
+    {
+    value: '4',
+    },
+    {
+    value: '5',
+    },
+    {
+    value: '6',
+    }
+]

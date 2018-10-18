@@ -12,7 +12,8 @@ import {
   CHANGE_CHATROOM,
   SEND_MESSAGE,
   NO_JOINED_ROOMS,
-  ERROR_SUBSCRIBING
+  ERROR_SUBSCRIBING,
+  CREATE_ROOM
 } from '../Constants'
 
 import {
@@ -83,7 +84,6 @@ export const subscribeToAllJoined = userId => async dispatch => {
   }
 }
 
-
 /**
  * Interacts with our /server
  */
@@ -100,4 +100,11 @@ export const fetchJoinableRooms = (game, userId) => async dispatch => {
 export const fetchJoinedRooms = (game, userId) => async dispatch => {
   let { data } = await axios.get(`${SERVER_URL}/userrooms?game=${game}&userId=${userId}`);
   dispatch({ type: FETCH_JOINED_ROOMS, rooms: data });
+}
+
+export const createNewRoom = (name, creatorId, game, occupancy) => async dispatch => {
+  // game be [ PUBG, WOW, CSGO, LOL ]
+  name = `${game}-${name}-${occupancy}`;
+  let { data } = await axios.post(`${SERVER_URL}/createroom`, { name, creatorId })
+  dispatch({ type: CREATE_ROOM })
 }

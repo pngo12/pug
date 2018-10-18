@@ -7,14 +7,14 @@ import {
   SUBSCRIBE,
   CHANGE_CHATROOM,
   SEND_MESSAGE,
-  NO_JOINED_ROOMS
+  NO_JOINED_ROOMS,
 } from '../Constants'
 
-const _createRoom = ({ roomId, messages }) => ({
+const _createRoom = ({ roomId, roomName }) => ({
+  roomName,
   roomId,
-  messages,
-  // capacity,
-  // users: []
+  // occupancy,
+  users: []
 })
 
 const _addMessage = ({ roomId, incomingMsg }, rooms) => {
@@ -39,7 +39,8 @@ const initialState = {
   rooms: [],
   connected: false,
   doneInitialSubscriptions: false,       // can be used to signal end of pre-loading; end of loading screen
-  currentRoomId: 0
+  currentRoomId: 0,
+  occupancy: 0
 };
 
 const chatReducer = (state = initialState, action) => {

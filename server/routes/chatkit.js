@@ -9,7 +9,8 @@ const {
   getAllUsers,
   getAllJoinableRoomsOfSpecificGame,
   getAllJoinedRooms,
-  getAllJoinedRoomsOfSpecificGame
+  getAllJoinedRoomsOfSpecificGame,
+  createRoom
 } = require('../controllers/chatkit-controller');
 
 
@@ -22,5 +23,6 @@ router.get('/allusers', getAllUsers)
 
 router.post('/createuser', createUser)
 router.post('/login', loginUser)
+router.post('/createroom', createRoom)
 
 module.exports = router;
